@@ -1,1 +1,0 @@
-msgbox %A_Hour% %A_Min%
