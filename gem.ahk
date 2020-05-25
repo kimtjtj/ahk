@@ -11,7 +11,7 @@ return
 gemcraft1:
 if(start = 0)
 {
-	MsgBox, , end, end
+	MsgBox, , end
 	return
 }
 
@@ -37,33 +37,36 @@ controlclick, x466 y550, GemCraft Frostborn Wrath, , left, 1, u
 controlsend, , uu, GemCraft Frostborn Wrath
 
 controlclick, x1430 y600, GemCraft Frostborn Wrath, , left, 1
-controlsend, , u, GemCraft Frostborn Wrath
+controlsend, , uu, GemCraft Frostborn Wrath
 
 controlclick, x1518 y600, GemCraft Frostborn Wrath, , left, 1
-controlsend, , u, GemCraft Frostborn Wrath
+controlsend, , uu, GemCraft Frostborn Wrath
 
 controlsend, , g, GemCraft Frostborn Wrath
 controlclick, x1434 y410, GemCraft Frostborn Wrath, , left, 1, d
 
 controlclick, x1470 y410, GemCraft Frostborn Wrath, , left, 1, u
 controlsend, , ddd, GemCraft Frostborn Wrath
-controlsend, , uu, GemCraft Frostborn Wrath
 
 controlclick, x960 y210, GemCraft Frostborn Wrath, , left, 1
-controlsend, , u, GemCraft Frostborn Wrath
+controlsend, , uu, GemCraft Frostborn Wrath
 
 controlclick, x690 y230, GemCraft Frostborn Wrath, , left, 1
-controlsend, , u, GemCraft Frostborn Wrath
+controlsend, , uu, GemCraft Frostborn Wrath
 
 controlclick, x620 y320, GemCraft Frostborn Wrath, , left, 1
-controlsend, , u, GemCraft Frostborn Wrath
-controlclick, x70 y50, GemCraft Frostborn Wrath, , left, 1
+controlsend, , uuuu, GemCraft Frostborn Wrath
+;~ controlclick, x70 y50, GemCraft Frostborn Wrath, , left, 1
+
+; 638, 648
+controlclick, x638 y648 , GemCraft Frostborn Wrath, , left, 1
+controlsend, , uu, GemCraft Frostborn Wrath
 
 controlsend, , qq, GemCraft Frostborn Wrath
 
 ;~ controlclick, x70 y640, GemCraft Frostborn Wrath, , left, 1
 
-sleep 35000
+sleep 43000
 
 ;~ settimer, removeToolTip, -2000
 
@@ -75,6 +78,13 @@ sleep 35000
 ;~ sleep 5000
 
 controlclick, x1400 y800, GemCraft Frostborn Wrath, , left, 1
+
+if(start = 0)
+{
+	MsgBox, , end
+	return
+}
+
 sleep 6000
 
 controlclick, x800 y450, GemCraft Frostborn Wrath, , left, 1
@@ -108,7 +118,8 @@ return
 
 
 ^!d::
-settimer, killgem, -7200000
+exittime := -5 * 3600 * 1000
+settimer, killgem, %exittime%
 return
 
 killgem:

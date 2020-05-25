@@ -1,8 +1,15 @@
 ^!t::
 inputbox, hour, Hour(0~24)
+if(ErrorLevel != 0)
+	return
+
 inputbox, min, Min(0~59), , , , , , , , , 0
+if(ErrorLevel != 0)
+	return
 
 inputbox, where, meeting WHERE?, , , , , , , , , ACT1 or ACT2
+if(ErrorLevel != 0)
+	return
 
 remainHour := hour - A_Hour
 remainMin := min - A_Min
