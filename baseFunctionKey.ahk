@@ -1,5 +1,5 @@
 enable=1
-listKeys := ["f1", "f2"]
+listKeys := ["f1", "``"]
 
 f1::
 click
@@ -7,13 +7,13 @@ sleep 1
 
 return
 
-f2::
-MouseGetPos, mouseX, mouseY
-click
-sleep, 50
-click, 750, 550
-MouseMove, %mouseX%, %mouseY%
-return
+;~ f2::
+;~ MouseGetPos, mouseX, mouseY
+;~ click
+;~ sleep, 50
+;~ click, 750, 550
+;~ MouseMove, %mouseX%, %mouseY%
+;~ return
 
 
 ScrollLock::

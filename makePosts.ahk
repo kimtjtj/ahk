@@ -1,11 +1,11 @@
 maxLine = 150
 outputDir = D:\kimtjtj\myblog\_posts\
-sourceFile = dh.txt
+sourceFile = ca.txt
 maxFile = ;5
 readFileEncoding = cp51949  ; euckr = cp51949, cp949, utf-8
 writeFileEncoding = utf-8  ; euckr = cp51949, cp949, utf-8
 running=
-datePost = 2020-02-10-
+datePost = 2020-10-26-
 
 SetTimer, Running, 2000
 
@@ -43,7 +43,7 @@ Loop, Read, %sourceFile%
 		SetFormat, FloatFast, 0.2
 		percentage := outFile / fileCount * 100
 		
-		preFile = ---`nlayout: post`n`ntitle:  `"%outFile% / %fileCount%. (%percentage%)`"`ncategories: jekyll update`n---`n
+		preFile = ---`nlayout: post`n`ntitle:  `"%outFile% / %fileCount%. (%percentage%`%)`"`ncategories: jekyll update`n---`n
 		FileDelete, %outFileName%
 		FileAppend, %preFile%, %outFileName%
 		if(lastReadLine!="")
