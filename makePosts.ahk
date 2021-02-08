@@ -1,6 +1,6 @@
 maxLine = 150
-outputDir = D:\kimtjtj\home\_posts\
-sourceFile = c:\cgr.txt
+outputDir = D:\kimtjtj\public\_posts\
+sourceFile = C:\Users\teajun.kim\Downloads\cgr.txt
 maxFile = ;5
 readFileEncoding = cp51949  ; euckr = cp51949, cp949, utf-8
 writeFileEncoding = utf-8  ; euckr = cp51949, cp949, utf-8
@@ -48,17 +48,13 @@ Loop, Read, %sourceFile%
 		preFile = ---`nlayout: post`n`ntitle:  `"%outFile% / %fileCount%. (%percentage%`%)`"`ncategories: jekyll update`n---`n
 		FileDelete, %outFileName%
 		page .= preFile
-		FileAppend, %preFile%, %outFileName%
-
-		if(lastReadLine!="")
-			page .= preFile . "`n`n"
 	}
 	
 	lastReadLine = %A_LoopReadLine%
 	lastReadLine := StrReplace(lastReadLine, "<", "[")
 	lastReadLine := StrReplace(lastReadLine, ">", "]")
 	lastReadLine := StrReplace(lastReadLine, "#", "")
-	page .= lastReadLine
+	page .= lastReadLine . "`n`n"
 
 	line++
 	if(line = maxLine)
