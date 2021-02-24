@@ -26,6 +26,12 @@ if(once = "")
 once = ran
 
 Gui, Show, , name
+
+SetTimer, oktimeout, -300000
+return
+
+oktimeout:
+goto Submit
 return
 
 Submit:

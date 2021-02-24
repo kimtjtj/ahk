@@ -8,15 +8,25 @@ gosub init
 
 init:
 gosub init_stretching
+strF1Label = DestroyInventory
+strF2Label = 
+
 return
 
 ^`::
-Run, notepad++ %A_ScriptDir%\winUtility.ini
+Run, notepad++.exe "%A_ScriptDir%\winUtility.ini"
 return
 
 `::
 gosub loadCommands
-ToolTip, `Esc : cancel`nF4 : ExitMacro`nF1 : buildTower`nF2 : fesizingGemWin`n%commandString%.
+strTooltip = Esc : cancel`nF4 : ExitMacro
+if(strF1Label != "")
+	strTooltip .= "`nF1 : " . strF1Label
+if(strF2Label != "")
+	strTooltip .= "`nF2 : " . strF2Label
+strTooltip .= "`n" . commandString
+
+ToolTip, %strTooltip%
 
 Input, inputKey, L1, {esc}``{F4}{F1}{F2}{F3}
 if(ErrorLevel = "EndKey:``")
@@ -38,6 +48,11 @@ else if(ErrorLevel = "EndKey:F2")
 {
 	gosub exitCommand
 	gosub f2Label
+}
+else if(ErrorLevel = "EndKey:F3")
+{
+	gosub exitCommand
+	gosub f3Label
 }
 else if(ErrorLevel = "EndKey:F4")
 {
@@ -65,31 +80,24 @@ return
 
 
 f1Label:
-send {esc}
-click, 550, 370
-Sleep, 300
-click, 550, 370
-sleep, 300
-send {esc}
+MouseGetPos, x, y
+Click, Right
+d = 0
+loop 9
+{
+	d += 44
+	MouseMove, % x + d, %y%
+	click, Right
+}
+MouseMove, %x%, %y%
 return
 
 f2Label:
-MouseGetPos, outX, outY
-Click Down
-
-y=%outy%
-while(y > 10)
-{
-	MouseMove, 0, -200, , R
-	MouseGetPos, , y
-}
-click up
-MouseMove, %outX%, %outY%
-
+	click WheelUp
 return
 
 f3Label:
-WinActivate, ahk_exe Solar-PuTTY.exe
+	click WheelDown
 return
 
 loadCommands:
@@ -107,9 +115,10 @@ return
 
 fileCommand(str)
 {
-	FileDelete, d:\command.ahk
-	FileAppend, %str%, d:\command.ahk
-	command = "%A_AhkPath%" "d:\command.ahk"
+	commandFile = e:\command.ahk
+	FileDelete, %commandFile%
+	FileAppend, %str%, %commandFile%
+	command = %A_AhkPath% %commandFile%
 	Run, %command%
 	
 	return

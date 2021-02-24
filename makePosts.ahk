@@ -1,6 +1,6 @@
 maxLine = 150
-outputDir = D:\kimtjtj\public\_posts\
-sourceFile = C:\Users\teajun.kim\Downloads\cgr.txt
+outputDir = E:\git\makePosts\public\_posts\
+sourceFile = E:\dnd.txt
 maxFile = ;5
 readFileEncoding = cp51949  ; euckr = cp51949, cp949, utf-8
 writeFileEncoding = utf-8  ; euckr = cp51949, cp949, utf-8
@@ -57,7 +57,7 @@ Loop, Read, %sourceFile%
 	page .= lastReadLine . "`n`n"
 
 	line++
-	if(line = maxLine)
+	if(line = maxLine || A_Index = totalLine)
 	{
 		FileAppend, %page%, %outFileName%
 		page = 
