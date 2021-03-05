@@ -17,10 +17,17 @@ init:
 IniRead, paths, %A_ScriptDir%\svnUpdate.ini, svnUpdate, paths
 paths := StrReplace(paths, "|", "`n")
 
+IniRead, preExecs, %A_ScriptDir%\svnUpdate.ini, svnUpdate, preExecs
+preExecs := StrReplace(preExecs, "|", "`n")
+
 if(once = "")
 {
 	Gui, Add, Text, , input path to svnupdate
-	Gui, Add, Edit, w300 r10 vResizeCL, %paths%
+	Gui, Add, Edit, w400 r10 vResizeCL, %paths%
+	
+	Gui, Add, Text, , input exes before executing
+	Gui, Add, Edit, w400 r3 vPreExecs, %preExecs%
+
 	Gui, Add, Button, gSubmit Default, OK
 }
 once = ran
@@ -40,7 +47,10 @@ Gui, Submit
 paths := ResizeCL
 paths := StrReplace(paths, "`n", "|")
 
+preExecs := StrReplace(preExecs, "`n", "|")
+
 IniWrite, %paths%, %A_ScriptDir%\svnUpdate.ini, svnUpdate, paths
+IniWrite, %preExecs%, %A_ScriptDir%\svnUpdate.ini, svnUpdate, preExecs
 
 period := 1 * 60 * 60 * 1000
 SetTimer, timerCommands, %period%
@@ -57,6 +67,15 @@ if(now = 4)
 return
 
 svnUpdate:
+execs := StrSplit(preExecs, ["|", "`n"])
+for k, exec in execs
+{
+	if(exec = "")
+		continue
+	;~ MsgBox, %exec%
+	Run, %ComSpec% /c %exec%, E:\
+}
+
 if(svnpath == "")
 {
 	svnpaths := StrSplit(ResizeCL, "`n")

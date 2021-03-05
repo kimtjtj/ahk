@@ -12,7 +12,7 @@ SetTimer, Running, 2000
 
 Running:
 tooltip, makePosts %running%
-return
+;~ return
 
 ^f1::
 Run, %A_WorkingDir%
