@@ -47,7 +47,7 @@ if(which = "" || rev = "")
 }
 
 global svnpath
-svnpath = %A_ScriptDir%\ProjectMCServer\Tools\Subversion\svn.exe
+svnpath = %alphaPath%\ProjectMCServer\Tools\Subversion\svn.exe
 IfNotExist, %svnpath%
 {
 	MsgBox, SVN.exe not found, %svnpath%
@@ -140,6 +140,6 @@ merge(from, to, rev)
 		ExitApp
 	}
 
-	msgbox %tempRev%
+	;~ msgbox %tempRev%
 	return %tempRev%
 }
