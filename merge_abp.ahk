@@ -143,3 +143,6 @@ merge(from, to, rev)
 	;~ msgbox %tempRev%
 	return %tempRev%
 }
+
+GuiClose:
+ExitApp
