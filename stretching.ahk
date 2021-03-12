@@ -33,7 +33,7 @@ return
 label_work:
 tempHour := startWorkHour - 1
 tempMin = 55
-timeoutMs := 10 * 60 * 1000
+timeoutMs := 20 * 60
 if(tempHour = A_Hour && tempMin = A_Min)
 	MsgBox, 0x40000, Start Work, `n`n`n`t`tStart Work`t`t `n`n`n, %timeoutMs%
 
