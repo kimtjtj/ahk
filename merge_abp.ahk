@@ -86,8 +86,15 @@ merge(from, to, rev)
 		ExitApp
 	}
 	
+	exec = cmd.exe /c %svnpath% info  %from% | findstr "^URL:"
+	url := ComObjCreate("WScript.Shell").Exec(exec).StdOut.ReadAll()
+	url := StrReplace(url, "URL: ")
+	;~ MsgBox %exec%`n`n%url%
+	
 	;~ msgbox %svnpath% merge -c %rev% %from% %to%
-	commitMessage = Merged revision(s) %rev%`n
+	commitMessage = Merged revision(s) %rev% %url%`n
+	;~ msgbox %commitMessage%
+	
 	revs := StrSplit(rev, ",")
 	for key, val in revs
 	{
