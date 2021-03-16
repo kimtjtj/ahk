@@ -93,11 +93,12 @@ merge(from, to, rev)
 	exec = cmd.exe /c %svnpath% info  %from% | findstr /B /C:"Repository Root:"
 	root := ComObjCreate("WScript.Shell").Exec(exec).StdOut.ReadAll()
 	root := StrReplace(root, "Repository Root: ")
+	root := StrReplace(root, "`n")
+	root := StrReplace(root, "`r")
 	url := StrReplace(url, root)
-	url := StrReplace(url, "\n")
 	if(url = "")
 		url = /
-	;~ MsgBox %exec%`n`nurl %url%`n`nroot %root%
+	MsgBox %exec%`n`nurl %url%`n`nroot %root%
 	
 	;~ msgbox %svnpath% merge -c %rev% %from% %to%
 	commitMessage = Merged revision(s) %rev% from %url%:`n
@@ -135,7 +136,9 @@ merge(from, to, rev)
 	commitRevPos := InStr(commitResult, "Committed revision")
 	if(commitRevPos <= 0)
 	{
-		msgbox commitRevPos <= 0. commit failed from : %from%`nto : %to%`nrev : %rev%`nmessage : %commitResult%
+		msg = commitRevPos <= 0. commit failed from : %from%`nto : %to%`nrev : %rev%`nmessage : %commitResult%`n
+		msgbox %msg%
+		FileAppend, %msg%, %messageFile%
 		ExitApp
 	}
 	
@@ -151,7 +154,9 @@ merge(from, to, rev)
 	
 	if(tempRev = "")
 	{
-		msgbox tempRev = "". commit failed from : %from%`nto : %to%`nrev : %rev%`nmessage : %commitResult%
+		msg = tempRev = "". commit failed from : %from%`nto : %to%`nrev : %rev%`nmessage : %commitResult%`n
+		msgbox %msg%
+		FileAppend, %msg%, %messageFile%
 		ExitApp
 	}
 
