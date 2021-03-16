@@ -94,9 +94,10 @@ merge(from, to, rev)
 	root := ComObjCreate("WScript.Shell").Exec(exec).StdOut.ReadAll()
 	root := StrReplace(root, "Repository Root: ")
 	url := StrReplace(url, root)
+	url := StrReplace(url, "\n")
 	if(url = "")
 		url = /
-	;~ MsgBox %exec%`n`n%url%`n`n%root%
+	;~ MsgBox %exec%`n`nurl %url%`n`nroot %root%
 	
 	;~ msgbox %svnpath% merge -c %rev% %from% %to%
 	commitMessage = Merged revision(s) %rev% from %url%:`n
