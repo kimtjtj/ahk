@@ -99,8 +99,8 @@ merge(from, to, rev)
 	;~ MsgBox %exec%`n`n%url%`n`n%root%
 	
 	;~ msgbox %svnpath% merge -c %rev% %from% %to%
-	commitMessage = Merged revision(s) %rev% from %url%`n
-	msgbox %commitMessage%
+	commitMessage = Merged revision(s) %rev% from %url%:`n
+	;~ msgbox %commitMessage%
 	
 	revs := StrSplit(rev, ",")
 	for key, val in revs
