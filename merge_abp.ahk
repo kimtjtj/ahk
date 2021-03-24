@@ -58,6 +58,26 @@ betaRev := rev
 prRev := rev
 ptrRev := rev
 
+branchCount = 0
+Loop, Parse, which
+{
+	if(A_LoopField = "a" || A_LoopField = "b" || A_LoopField = "p")
+		branchCount++
+}
+
+mergeOnly := false
+mergeOnlyPos := InStr(which, "m", true)
+;~ MsgBox, %mergeOnlyPos%
+if(mergeOnlyPos > 0)
+{
+	mergeOnly := true
+	if(branchCount > 1) ; mergeOnly는 브랜치 하나만 가능
+	{
+		;~ MsgBox mergeOnly는 브랜치 하나만 가능
+		exitapp
+	}
+}
+
 alphaPos := InStr(which, "a", true)
 if(alphaPos > 0)
 {
@@ -89,17 +109,18 @@ merge(from, to, rev)
 	exec = cmd.exe /c %svnpath% info  %from% | findstr "^URL:"
 	url := ComObjCreate("WScript.Shell").Exec(exec).StdOut.ReadAll()
 	url := StrReplace(url, "URL: ")
-	url := StrReplace(url, "`n")
-	url := StrReplace(url, "`r")
-
+	url := removeNewLine(url)
+	
 	exec = cmd.exe /c %svnpath% info  %from% | findstr /B /C:"Repository Root:"
 	root := ComObjCreate("WScript.Shell").Exec(exec).StdOut.ReadAll()
 	root := StrReplace(root, "Repository Root: ")
-	root := StrReplace(root, "`n")
-	root := StrReplace(root, "`r")
+	root := removeNewLine(root)
+
 	url := StrReplace(url, root)
 	if(url = "")
 		url = /
+	else if(SubStr(url, 1, 1) = "/" && StrLen(url) >= 2 )
+		url := SubStr(url, 2)
 	;~ MsgBox %exec%`n`nurl %url%`n`nroot %root%
 	
 	;~ msgbox %svnpath% merge -c %rev% %from% %to%
@@ -124,42 +145,60 @@ merge(from, to, rev)
 		msgbox merge failed from : %from%`nto : %to%`nrev : %rev%`nmessage : %mergeResult%
 		ExitApp
 	}
-
-	messageFile = %A_ScriptDir%\svn_log.txt
-	FileDelete, %messageFile%
-	commitMessage := StrReplace(commitMessage, "`r`n", "`n")
-	FileAppend, %commitMessage%, %messageFile%
 	
-	exec = cmd.exe /c %svnpath% commit -F %messageFile% %to%
-	;~ msgbox %exec%
-	commitResult := ComObjCreate("WScript.Shell").Exec(exec).StdOut.ReadAll()
-	
-	;~ MsgBox %commitResult%
-	commitRevPos := InStr(commitResult, "Committed revision")
-	if(commitRevPos <= 0)
+	fromCSCommon = %from%\ProjectMCServer\MCCSCommon
+	toCSCommon = %to%\ProjectMCServer\MCCSCommon
+	if(FileExist(fromCSCommon) = "D" && FileExist(toCSCommon) = "D") ; cscommon 머지
 	{
-		msg = commitRevPos <= 0. commit failed from : %from%`nto : %to%`nrev : %rev%`nmessage : %commitResult%`n
-		msgbox %msg%
-		FileAppend, %msg%, %messageFile%
-		ExitApp
-	}
-	
-	for key, val in StrSplit(commitResult, "`n")
-	{
-		if(InStr(val, "Committed revision") > 0)
+		exec = cmd.exe /c %svnpath% merge -c %rev% --allow-mixed-revisions %fromCSCommon% %toCSCommon%
+		mergeResult := ComObjCreate("WScript.Shell").Exec(exec).StdOut.ReadAll()
+		msgbox %mergeResult%
+		
+		if(InStr(mergeResult, "Conflict", false) > 0)
 		{
-			tempRev = %val%
-			tempRev := StrReplace(tempRev, "Committed revision ")
-			tempRev := StrReplace(tempRev, ".")
+			msgbox merge failed from : %fromCSCommon%`nto : %toCSCommon%`nrev : %rev%`nmessage : %mergeResult%
+			ExitApp
 		}
 	}
 	
-	if(tempRev = "")
+	messageFile = %A_ScriptDir%\svn_log.txt
+	FileDelete, %messageFile%
+	commitMessage := StrReplace(commitMessage, "`r`n", "`n")
+	FileAppend, %commitMessage%, %messageFile%, utf-8
+	
+	if(mergeOnly = false)
 	{
-		msg = tempRev = "". commit failed from : %from%`nto : %to%`nrev : %rev%`nmessage : %commitResult%`n
-		msgbox %msg%
-		FileAppend, %msg%, %messageFile%
-		ExitApp
+		exec = cmd.exe /c %svnpath% commit -F %messageFile% %to%
+		;~ msgbox %exec%
+		commitResult := ComObjCreate("WScript.Shell").Exec(exec).StdOut.ReadAll()
+		
+		;~ MsgBox %commitResult%
+		commitRevPos := InStr(commitResult, "Committed revision")
+		if(commitRevPos <= 0)
+		{
+			msg = commitRevPos <= 0. commit failed from : %from%`nto : %to%`nrev : %rev%`nmessage : %commitResult%`n
+			msgbox %msg%
+			FileAppend, %msg%, %messageFile%, utf-8
+			ExitApp
+		}
+		
+		for key, val in StrSplit(commitResult, "`n")
+		{
+			if(InStr(val, "Committed revision") > 0)
+			{
+				tempRev = %val%
+				tempRev := StrReplace(tempRev, "Committed revision ")
+				tempRev := StrReplace(tempRev, ".")
+			}
+		}
+		
+		if(tempRev = "")
+		{
+			msg = tempRev = "". commit failed from : %from%`nto : %to%`nrev : %rev%`nmessage : %commitResult%`n
+			msgbox %msg%
+			FileAppend, %msg%, %messageFile%, utf-8
+			ExitApp
+		}
 	}
 
 	;~ msgbox %tempRev%
@@ -168,3 +207,10 @@ merge(from, to, rev)
 
 GuiClose:
 ExitApp
+
+removeNewLine(str)
+{
+	str := StrReplace(str, "`n")
+	str := StrReplace(str, "`r")
+	return str
+}
