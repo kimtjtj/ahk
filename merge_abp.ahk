@@ -35,7 +35,7 @@ goto svnup
 return
 
 svnup:
-InputBox, which, which branches to merge, A(a) : alpha to BETA`nB(b) : beta to PR`nP(p) : pr to PTR`nex) "abp" => merge to beta, pr, ptr
+InputBox, which, which branches to merge, A(a) : alpha to BETA`nB(b) : beta to PR`nP(p) : pr to PTR`nm(M) : mergeOnly`nex) "abp" => merge to beta`, pr`, ptr`n`"am`" => merge to beta without commit(mergeOnly)
 
 InputBox, rev, Revision Numbers to merge, ex) 61013`n63301`, 63304`n
 rev := StrReplace(rev, " ")
@@ -66,6 +66,7 @@ Loop, Parse, which
 }
 
 mergeOnly := false
+global mergeOnly
 mergeOnlyPos := InStr(which, "m", true)
 ;~ MsgBox, %mergeOnlyPos%
 if(mergeOnlyPos > 0)
@@ -106,13 +107,15 @@ merge(from, to, rev)
 		ExitApp
 	}
 	
+	logFile = %A_ScriptDir%\merge_abp.log
+
 	exec = cmd.exe /c %svnpath% info  %from% | findstr "^URL:"
-	url := ComObjCreate("WScript.Shell").Exec(exec).StdOut.ReadAll()
+	url := RunCommand(exec, logFile)
 	url := StrReplace(url, "URL: ")
 	url := removeNewLine(url)
 	
 	exec = cmd.exe /c %svnpath% info  %from% | findstr /B /C:"Repository Root:"
-	root := ComObjCreate("WScript.Shell").Exec(exec).StdOut.ReadAll()
+	root := RunCommand(exec, logFile)
 	root := StrReplace(root, "Repository Root: ")
 	root := removeNewLine(root)
 
@@ -131,13 +134,13 @@ merge(from, to, rev)
 	for key, val in revs
 	{
 		exec = cmd.exe /c %svnpath% propget svn:log --revprop -r %val% %from%
-		commitMessage .= ComObjCreate("WScript.Shell").Exec(exec).StdOut.ReadAll()
+		commitMessage .= RunCommand(exec, logFile)
 	}
 
 	;~ MsgBox, %message%
 	
 	exec = cmd.exe /c %svnpath% merge -c %rev% --allow-mixed-revisions %from% %to%
-	mergeResult := ComObjCreate("WScript.Shell").Exec(exec).StdOut.ReadAll()
+	mergeResult := RunCommand(exec, logFile)
 	;~ msgbox %mergeResult%
 	
 	if(InStr(mergeResult, "Conflict", false) > 0)
@@ -151,8 +154,8 @@ merge(from, to, rev)
 	if(FileExist(fromCSCommon) = "D" && FileExist(toCSCommon) = "D") ; cscommon 머지
 	{
 		exec = cmd.exe /c %svnpath% merge -c %rev% --allow-mixed-revisions %fromCSCommon% %toCSCommon%
-		mergeResult := ComObjCreate("WScript.Shell").Exec(exec).StdOut.ReadAll()
-		msgbox %mergeResult%
+		mergeResult := RunCommand(exec, logFile)
+		;~ msgbox %mergeResult%
 		
 		if(InStr(mergeResult, "Conflict", false) > 0)
 		{
@@ -164,13 +167,13 @@ merge(from, to, rev)
 	messageFile = %A_ScriptDir%\svn_log.txt
 	FileDelete, %messageFile%
 	commitMessage := StrReplace(commitMessage, "`r`n", "`n")
-	FileAppend, %commitMessage%, %messageFile%, utf-8
+	FileAppend, %commitMessage%, %messageFile%
 	
 	if(mergeOnly = false)
 	{
 		exec = cmd.exe /c %svnpath% commit -F %messageFile% %to%
 		;~ msgbox %exec%
-		commitResult := ComObjCreate("WScript.Shell").Exec(exec).StdOut.ReadAll()
+		commitResult := RunCommand(exec, logFile)
 		
 		;~ MsgBox %commitResult%
 		commitRevPos := InStr(commitResult, "Committed revision")
@@ -178,7 +181,6 @@ merge(from, to, rev)
 		{
 			msg = commitRevPos <= 0. commit failed from : %from%`nto : %to%`nrev : %rev%`nmessage : %commitResult%`n
 			msgbox %msg%
-			FileAppend, %msg%, %messageFile%, utf-8
 			ExitApp
 		}
 		
@@ -196,7 +198,6 @@ merge(from, to, rev)
 		{
 			msg = tempRev = "". commit failed from : %from%`nto : %to%`nrev : %rev%`nmessage : %commitResult%`n
 			msgbox %msg%
-			FileAppend, %msg%, %messageFile%, utf-8
 			ExitApp
 		}
 	}
@@ -212,5 +213,13 @@ removeNewLine(str)
 {
 	str := StrReplace(str, "`n")
 	str := StrReplace(str, "`r")
+	return str
+}
+
+RunCommand(exec, filename)
+{
+	str := ComObjCreate("WScript.Shell").Exec(exec).StdOut.ReadAll()
+	FileEncoding, UTF-8
+	FileAppend, % "command : " . exec . "`n`nResult : " . str . "`n`n", %filename%
 	return str
 }
