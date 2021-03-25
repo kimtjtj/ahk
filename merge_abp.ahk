@@ -219,7 +219,7 @@ removeNewLine(str)
 RunCommand(exec, filename)
 {
 	str := ComObjCreate("WScript.Shell").Exec(exec).StdOut.ReadAll()
-	FileEncoding, UTF-8
+	FileEncoding, UTF-8-RAW
 	FileAppend, % "command : " . exec . "`n`nResult : " . str . "`n`n", %filename%
 	return str
 }
