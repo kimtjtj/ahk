@@ -171,7 +171,7 @@ merge(from, to, rev)
 	
 	if(mergeOnly = false)
 	{
-		exec = cmd.exe /c %svnpath% commit -F %messageFile% %to%
+		exec = cmd.exe /c %svnpath% commit --encoding UTF-8 -F %messageFile% %to%
 		;~ msgbox %exec%
 		commitResult := RunCommand(exec, logFile)
 		
