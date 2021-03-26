@@ -35,7 +35,7 @@ goto svnup
 return
 
 svnup:
-InputBox, which, which branches to merge, A(a) : alpha to BETA`nB(b) : beta to PR`nP(p) : pr to PTR`nm(M) : mergeOnly`nex) "abp" => merge to beta`, pr`, ptr`n`"am`" => merge to beta without commit(mergeOnly)
+InputBox, which, which branches to merge, A(a) : alpha to BETA`nB(b) : beta to PR`nP(p) : pr to PTR`nM(m) : mergeOnly`nex) "abp" => merge to beta`, pr`, ptr`n`"am`" => merge to beta without commit(mergeOnly), , , 230
 
 InputBox, rev, Revision Numbers to merge, ex) 61013`n63301`, 63304`n
 rev := StrReplace(rev, " ")
