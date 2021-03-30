@@ -1,4 +1,4 @@
-gosub init
+gosub initSvnUpdate
 
 ^!+F4::
 ExitApp
@@ -8,10 +8,10 @@ gosub, svnUpdate
 return
 
 ^!+F2::
-gosub, init
+gosub, initSvnUpdate
 return
 
-init:
+initSvnUpdate:
 ;~ InputBox, svnpath, SVN.exe path, input svn.exe path
 
 IniRead, paths, %A_ScriptDir%\svnUpdate.ini, svnUpdate, paths
@@ -20,6 +20,8 @@ paths := StrReplace(paths, "|", "`n")
 IniRead, preExecs, %A_ScriptDir%\svnUpdate.ini, svnUpdate, preExecs
 preExecs := StrReplace(preExecs, "|", "`n")
 
+IniRead, startHour, %A_ScriptDir%\svnUpdate.ini, svnUpdate, startHour, 4
+
 if(once = "")
 {
 	Gui, Add, Text, , input path to svnupdate
@@ -27,6 +29,9 @@ if(once = "")
 	
 	Gui, Add, Text, , input exes before executing
 	Gui, Add, Edit, w400 r3 vPreExecs, %preExecs%
+
+	Gui, Add, Text, , Start Hour
+	Gui, Add, Edit, w400 vStartHour, %startHour%
 
 	Gui, Add, Button, gSubmit Default, OK
 }
@@ -44,6 +49,12 @@ return
 Submit:
 Gui, Submit
 
+if startHour is not integer
+{
+	MsgBox, startHour have to be NUMBER
+	exitapp
+}
+
 paths := ResizeCL
 paths := StrReplace(paths, "`n", "|")
 
@@ -51,6 +62,7 @@ preExecs := StrReplace(preExecs, "`n", "|")
 
 IniWrite, %paths%, %A_ScriptDir%\svnUpdate.ini, svnUpdate, paths
 IniWrite, %preExecs%, %A_ScriptDir%\svnUpdate.ini, svnUpdate, preExecs
+IniWrite, %startHour%, %A_ScriptDir%\svnUpdate.ini, svnUpdate, startHour
 
 period := 1 * 60 * 60 * 1000
 SetTimer, timerCommands, %period%
@@ -94,6 +106,10 @@ if(svnpath == "")
 			break ; svn.exe is found
 		
 		svnpath = %temppath%Binaries\Subversion\svn.exe
+		if(FileExist(svnpath) != "")
+			break ; svn.exe is found
+		
+		svnpath = %temppath%Tools\Subversion\svn.exe
 		if(FileExist(svnpath) != "")
 			break ; svn.exe is found
 	}
