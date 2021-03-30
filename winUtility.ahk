@@ -1,13 +1,14 @@
 
-gosub init
+gosub initWinUtility
 
-#include %A_ScriptDir%\baseFunctionKey.ahk
+#Include %A_ScriptDir%\baseFunctionKey.ahk
 #IncludeAgain %A_ScriptDir%\stretching.ahk
 #IncludeAgain %A_ScriptDir%\timerTask.ahk
-#IncludeAgain %A_ScriptDir%\gem.ahk
+#IncludeAgain %A_ScriptDir%\svnUpdate.ahk
 
-init:
+initWinUtility:
 gosub init_stretching
+gosub initSvnUpdate
 strF1Label = DestroyInventory
 strF2Label = 
 
@@ -76,8 +77,8 @@ tooltip
 return
 
 ; start at 15, 199
-; 103, 94
 
+; 103, 94
 
 f1Label:
 MouseGetPos, x, y
@@ -85,7 +86,7 @@ Click, Right
 d = 0
 loop 9
 {
-	d += 44
+	d += 50
 	MouseMove, % x + d, %y%
 	click, Right
 }

@@ -7,15 +7,6 @@ sleep 1
 
 return
 
-;~ f2::
-;~ MouseGetPos, mouseX, mouseY
-;~ click
-;~ sleep, 50
-;~ click, 750, 550
-;~ MouseMove, %mouseX%, %mouseY%
-;~ return
-
-
 ScrollLock::
 if(enable=0)
 {
