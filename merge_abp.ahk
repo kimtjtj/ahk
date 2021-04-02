@@ -134,7 +134,7 @@ merge(from, to, rev)
 	for key, val in revs
 	{
 		exec = cmd.exe /c %svnpath% propget svn:log --revprop -r %val% %from%
-		commitMessage .= RunCommand(exec, logFile)
+		commitMessage .= RunCommand(exec, logFile) . "`r`n"
 	}
 
 	;~ MsgBox, %message%
