@@ -191,6 +191,7 @@ merge(from, to, rev)
 				tempRev = %val%
 				tempRev := StrReplace(tempRev, "Committed revision ")
 				tempRev := StrReplace(tempRev, ".")
+				tempRev := removeNewLine(tempRev)
 			}
 		}
 		
