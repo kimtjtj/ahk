@@ -3,8 +3,7 @@ goto init
 init:
 IniRead, alphaPath, %A_ScriptDir%\merge_abp.ini, merge, alphaPath
 IniRead, betaPath, %A_ScriptDir%\merge_abp.ini, merge, betaPath
-IniRead, prPath, %A_ScriptDir%\merge_abp.ini, merge, prPath
-IniRead, ptrPath, %A_ScriptDir%\merge_abp.ini, merge, ptrPath
+IniRead, livePath, %A_ScriptDir%\merge_abp.ini, merge, livePath
 
 gui, add, Text, , alpha path
 gui, add, edit, w400 valphaPath, %alphaPath%
@@ -12,11 +11,8 @@ gui, add, edit, w400 valphaPath, %alphaPath%
 gui, add, Text, , beta path
 gui, add, edit, w400 vbetaPath, %betaPath%
 
-gui, add, Text, , pr path
-gui, add, edit, w400 vprPath, %prPath%
-
-gui, add, Text, , ptr path
-gui, add, edit, w400 vptrPath, %ptrPath%
+gui, add, Text, , live path
+gui, add, edit, w400 vlivePath, %livePath%
 
 gui, add, button, gSubmit Default, OK
 
@@ -28,14 +24,13 @@ gui, submit
 
 IniWrite, %alphaPath%, %A_ScriptDir%\merge_abp.ini, merge, alphaPath
 IniWrite, %betaPath%, %A_ScriptDir%\merge_abp.ini, merge, betaPath
-IniWrite, %prPath%, %A_ScriptDir%\merge_abp.ini, merge, prPath
-IniWrite, %ptrPath%, %A_ScriptDir%\merge_abp.ini, merge, ptrPath
+IniWrite, %livePath%, %A_ScriptDir%\merge_abp.ini, merge, livePath
 
 goto svnup
 return
 
 svnup:
-InputBox, which, which branches to merge, A(a) : alpha to BETA`nB(b) : beta to PR`nP(p) : pr to PTR`nM(m) : mergeOnly`nex) "abp" => merge to beta`, pr`, ptr`n`"am`" => merge to beta without commit(mergeOnly), , , 230
+InputBox, which, which branches to merge, A(a) : alpha to BETA`nB(b) : beta to LIVE`nM(m) : mergeOnly`nex) "ab" => merge to beta`, live`n`"am`" => merge to beta without commit(mergeOnly), , , 230
 
 InputBox, rev, Revision Numbers to merge, ex) 61013`n63301`, 63304`n
 rev := StrReplace(rev, " ")
@@ -55,14 +50,19 @@ IfNotExist, %svnpath%
 }
 
 betaRev := rev
-prRev := rev
-ptrRev := rev
+liveRev := rev
 
 branchCount = 0
 Loop, Parse, which
 {
-	if(A_LoopField = "a" || A_LoopField = "b" || A_LoopField = "p")
+	;~ if(A_LoopField = "a" || A_LoopField = "b" || A_LoopField = "p")
+	if(A_LoopField = "a" || A_LoopField = "b")
 		branchCount++
+}
+if(branchCount = 0)
+{
+	MsgBox, branch to merge isn't selected.
+	exitapp
 }
 
 mergeOnly := false
@@ -88,13 +88,7 @@ if(alphaPos > 0)
 betaPos := InStr(which, "b", true)
 if(betaPos > 0)
 {
-	prRev := merge(betaPath, prPath, betaRev)
-}
-
-ptrPos := InStr(which, "p", true)
-if(ptrPos > 0)
-{
-	ptrRev := merge(prPath, ptrPath, prRev)
+	liveRev := merge(betaPath, livePath, betaRev)
 }
 
 exitapp
@@ -137,7 +131,10 @@ merge(from, to, rev)
 		commitMessage .= RunCommand(exec, logFile) . "`r`n"
 	}
 
-	;~ MsgBox, %message%
+	messageFile = %A_ScriptDir%\svn_log.txt
+	FileDelete, %messageFile%
+	commitMessage := StrReplace(commitMessage, "`r`n", "`n")
+	FileAppend, %commitMessage%, %messageFile%
 	
 	exec = cmd.exe /c %svnpath% merge -c %rev% --allow-mixed-revisions %from% %to%
 	mergeResult := RunCommand(exec, logFile)
@@ -155,7 +152,6 @@ merge(from, to, rev)
 	{
 		exec = cmd.exe /c %svnpath% merge -c %rev% --allow-mixed-revisions %fromCSCommon% %toCSCommon%
 		mergeResult := RunCommand(exec, logFile)
-		;~ msgbox %mergeResult%
 		
 		if(InStr(mergeResult, "Conflict", false) > 0)
 		{
@@ -163,11 +159,6 @@ merge(from, to, rev)
 			ExitApp
 		}
 	}
-	
-	messageFile = %A_ScriptDir%\svn_log.txt
-	FileDelete, %messageFile%
-	commitMessage := StrReplace(commitMessage, "`r`n", "`n")
-	FileAppend, %commitMessage%, %messageFile%
 	
 	if(mergeOnly = false)
 	{

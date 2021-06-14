@@ -85,7 +85,8 @@ for k, exec in execs
 	if(exec = "")
 		continue
 	;~ MsgBox, %exec%
-	Run, %ComSpec% /c %exec%, E:\
+	SplitPath, exec, , outDir
+	RunWait, %exec%, %outDir%
 }
 
 if(svnpath == "")

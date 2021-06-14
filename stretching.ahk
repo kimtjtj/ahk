@@ -22,10 +22,10 @@ if(periodMin != "" && periodMin != 0)
 
 	lastTime = %A_Hour%:%A_Min%
 	settimer, label_tooltip, %periodMS%
+	gosub, label_tooltip
 }
 
 minToMs := 1 * 60 * 1000
-SetTimer, label_work, %minToMs%
 
 ;~ gosub label_tooltip
 return

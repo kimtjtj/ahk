@@ -7,7 +7,7 @@ inputbox, min, Min(0~59), , , , , , , , , 0
 if(ErrorLevel != 0)
 	return
 
-inputbox, where, meeting WHERE?, , , , , , , , , 
+inputbox, where, meet WHERE?, , , , , , , , , 
 if(ErrorLevel != 0)
 	return
 

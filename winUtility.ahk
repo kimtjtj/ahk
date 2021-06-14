@@ -2,9 +2,9 @@
 gosub initWinUtility
 
 #Include %A_ScriptDir%\baseFunctionKey.ahk
-#IncludeAgain %A_ScriptDir%\stretching.ahk
-#IncludeAgain %A_ScriptDir%\timerTask.ahk
-#IncludeAgain %A_ScriptDir%\svnUpdate.ahk
+#Include %A_ScriptDir%\stretching.ahk
+#Include %A_ScriptDir%\timerTask.ahk
+#Include %A_ScriptDir%\svnUpdate.ahk
 
 initWinUtility:
 gosub init_stretching
@@ -18,98 +18,76 @@ return
 Run, notepad++.exe "%A_ScriptDir%\winUtility.ini"
 return
 
+InputCommand:
 `::
 gosub loadCommands
 strTooltip = Esc : cancel`nF4 : ExitMacro
-if(strF1Label != "")
-	strTooltip .= "`nF1 : " . strF1Label
-if(strF2Label != "")
-	strTooltip .= "`nF2 : " . strF2Label
 strTooltip .= "`n" . commandString
 
 ToolTip, %strTooltip%
 
-Input, inputKey, L1, {esc}``{F4}{F1}{F2}{F3}
+Input, inputKey, L1, {esc}``{F1}{F2}{F3}{F4}{F5}{F6}{F7}{F8}{F9}{F10}{F11}{F12}{up}{down}{left}{right}{Insert}{Delete}{Home}{End}{PGUP}{PGDN}
 if(ErrorLevel = "EndKey:``")
 {
 	Hotkey, ``, Off
 	SendRaw, ``
 	Hotkey, ``, On
 }
-else if(ErrorLevel = "EndKey:Escape")
+if(ErrorLevel = "EndKey:F4")
 {
-	goto exitCommand
+	exitapp
 }
-else if(ErrorLevel = "EndKey:F1")
-{
-	gosub exitCommand
-	gosub f1Label
-}
-else if(ErrorLevel = "EndKey:F2")
-{
-	gosub exitCommand
-	gosub f2Label
-}
-else if(ErrorLevel = "EndKey:F3")
-{
-	gosub exitCommand
-	gosub f3Label
-}
-else if(ErrorLevel = "EndKey:F4")
-{
-	ExitApp
-}
+
+inputErrorLevel = %ErrorLevel%
 
 gosub, exitCommand
-
-if inputKey is integer
-{
-	command = % commands[inputKey]
-	quote := false
-		
-	;~ msgbox %command%
-	each := StrReplace(command, "||", "`r`n")
-	fileCommand(each)
-}
+gosub, execCommand
 
 exitCommand:
 tooltip
 return
 
-; start at 15, 199
+execCommand:
+IniRead, strCommands, %A_ScriptDir%\winUtility.ini, commands
+objCommands := StrSplit(strCommands, "`n")
 
-; 103, 94
-
-f1Label:
-MouseGetPos, x, y
-Click, Right
-d = 0
-loop 9
+for key, val in objCommands
 {
-	d += 50
-	MouseMove, % x + d, %y%
-	click, Right
+	posKey := InStr(val, "key_")
+	posEqual := Instr(val, "=")
+	length := posEqual - posKey - 4
+	
+	commandKey := SubStr(val, posKey + 4, length)
+	commandContent := SubStr(val, posEqual + 1)
+
+	posEndKey := InStr(inputErrorLevel, "EndKey:")
+	commandEndKey := SubStr(inputErrorLevel, posEndKey + 7)
+	
+	if(inputKey = commandKey || commandEndKey = commandKey)
+	{
+		each := StrReplace(commandContent, "||", "`r`n")
+		fileCommand(each)
+		break
+	}
 }
-MouseMove, %x%, %y%
-return
 
-f2Label:
-	click WheelUp
-return
-
-f3Label:
-	click WheelDown
 return
 
 loadCommands:
-IniRead, commandString, %A_ScriptDir%\winUtility.ini, common, command
+IniRead, strCommands, %A_ScriptDir%\winUtility.ini, commands
+objCommands := StrSplit(strCommands, "`n")
 
-commands := StrSplit(commandString, "@@")
 commandString =
-
-for k, v in commands
+for key, val in objCommands
 {
-	commandString .= k . " : " . v . "`n"
+	posKey := InStr(val, "key_")
+	posEqual := Instr(val, "=")
+	length := posEqual - posKey - 4
+	
+	commandKey := SubStr(val, posKey + 4, length)
+	commandContent := SubStr(val, posEqual + 1)
+
+	commandString .= commandKey . " : " . commandContent . "`n"
 }
 
 return
