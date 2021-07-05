@@ -11,6 +11,7 @@ gosub init_stretching
 gosub initSvnUpdate
 strF1Label = DestroyInventory
 strF2Label = 
+commandFile = %A_AppData%\command.ahk
 
 return
 
@@ -66,7 +67,7 @@ for key, val in objCommands
 	if(inputKey = commandKey || commandEndKey = commandKey)
 	{
 		each := StrReplace(commandContent, "||", "`r`n")
-		fileCommand(each)
+		fileCommand(each, commandFile)
 		break
 	}
 }
@@ -92,9 +93,8 @@ for key, val in objCommands
 
 return
 
-fileCommand(str)
+fileCommand(str, commandFile)
 {
-	commandFile = e:\command.ahk
 	FileDelete, %commandFile%
 	FileAppend, %str%, %commandFile%
 	command = %A_AhkPath% %commandFile%
