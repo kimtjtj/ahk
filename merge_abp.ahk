@@ -79,6 +79,20 @@ if(mergeOnlyPos > 0)
 	}
 }
 
+
+logOnly := false
+global logOnly
+logOnlyPos := InStr(which, "l", true)
+;~ MsgBox, %mergeOnlyPos%
+if(logOnlyPos > 0)
+{
+	logOnly := true
+	if(branchCount > 1) ; logOnly는 브랜치 하나만 가능
+	{
+		exitapp
+	}
+}
+
 alphaPos := InStr(which, "a", true)
 if(alphaPos > 0)
 {
@@ -130,12 +144,15 @@ merge(from, to, rev)
 		exec = cmd.exe /c %svnpath% propget svn:log --revprop -r %val% %from%
 		commitMessage .= RunCommand(exec, logFile) . "`r`n"
 	}
-
+	
 	messageFile = %A_ScriptDir%\svn_log.txt
 	FileDelete, %messageFile%
 	commitMessage := StrReplace(commitMessage, "`r`n", "`n")
 	FileAppend, %commitMessage%, %messageFile%
-	
+
+	if(logOnly = true)
+		ExitApp
+
 	exec = cmd.exe /c %svnpath% merge -c %rev% --allow-mixed-revisions %from% %to%
 	mergeResult := RunCommand(exec, logFile)
 	;~ msgbox %mergeResult%
@@ -162,7 +179,7 @@ merge(from, to, rev)
 	
 	if(mergeOnly = false)
 	{
-		exec = cmd.exe /c %svnpath% commit --encoding UTF-8 -F %messageFile% %to%
+		exec = cmd.exe /c %svnpath% commit --encoding UTF-8 -F %messageFile% --include-externals %to%
 		;~ msgbox %exec%
 		commitResult := RunCommand(exec, logFile)
 		
