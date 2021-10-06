@@ -105,6 +105,8 @@ if(betaPos > 0)
 	liveRev := merge(betaPath, livePath, betaRev)
 }
 
+MsgBox, Complete
+
 exitapp
 
 merge(from, to, rev)
@@ -157,11 +159,9 @@ merge(from, to, rev)
 	mergeResult := RunCommand(exec, logFile)
 	;~ msgbox %mergeResult%
 	
+	errorMessage := ""
 	if(InStr(mergeResult, "Conflict", false) > 0)
-	{
-		msgbox merge failed from : %from%`nto : %to%`nrev : %rev%`nmessage : %mergeResult%
-		ExitApp
-	}
+		errorMessage = merge failed from : %from%`nto : %to%`nrev : %rev%`nmessage : %mergeResult%
 	
 	fromCSCommon = %from%\ProjectMCServer\MCCSCommon
 	toCSCommon = %to%\ProjectMCServer\MCCSCommon
@@ -171,10 +171,13 @@ merge(from, to, rev)
 		mergeResult := RunCommand(exec, logFile)
 		
 		if(InStr(mergeResult, "Conflict", false) > 0)
-		{
-			msgbox merge failed from : %fromCSCommon%`nto : %toCSCommon%`nrev : %rev%`nmessage : %mergeResult%
-			ExitApp
-		}
+			errorMessage = merge failed from : %fromCSCommon%`nto : %toCSCommon%`nrev : %rev%`nmessage : %mergeResult%
+	}
+	
+	if(errorMessage != "")
+	{
+		MsgBox %errorMessage%
+		exitapp
 	}
 	
 	if(mergeOnly = false)
