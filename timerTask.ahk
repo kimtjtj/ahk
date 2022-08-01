@@ -14,6 +14,9 @@ if(ErrorLevel != 0)
 remainHour := hour - A_Hour
 remainMin := min - A_Min
 
+if(remainHour < 0)
+	remainHour += 24
+
 totalSec := (remainHour * 3600 + remainMin * 60) * 1000 - 60000
 ;~ msgbox hour : %remainHour%, min : %remainMin%, total : %totalSec%
 
